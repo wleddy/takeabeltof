@@ -1,23 +1,16 @@
-from takeabeltof.date_utils import getDatetimeFromString
-from datetime import datetime
+from takeabeltof.date_utils import date_to_string
 
 # some custom filters for templates
-
-
-def short_date_string(value, format='%m/%d/%y'):
-    if value is None or value == "":
-        # test if value is None or the empty string
-        return value
-
-    if type(value) is datetime:
-        return value.strftime(format)
-    if type(value) is str:
-        return getDatetimeFromString(value).strftime(format)
+def iso_date_string(value):
+    format = '%Y-%m-%d'
+    return date_to_string(value,format)
+        
+        
+def short_date_string(value):
+    format='%m/%d/%y'
+    return date_to_string(value,format)
     
-    return value
-    
-    
-def two_digit_string(the_string):
+def two_decimal_string(the_string):
     #import pdb;pdb.set_trace()
     try:
         the_string = float(the_string)
@@ -34,4 +27,6 @@ def two_digit_string(the_string):
 def register_jinja_filters(app):
     # register the filters
     app.jinja_env.filters['short_date_string'] = short_date_string
-    app.jinja_env.filters['money'] = two_digit_string
+    app.jinja_env.filters['two_decimal_string'] = two_decimal_string
+    app.jinja_env.filters['money'] = two_decimal_string
+    app.jinja_env.filters['iso_date_string'] = iso_date_string

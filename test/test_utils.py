@@ -3,6 +3,7 @@ import sys
 sys.path.append('') ##get import to look in the working dir.
 
 import takeabeltof.utils as utils
+import takeabeltof.date_utils as dates
 
 def test_cleanRecordID():
     """Tesst the cleanRecordID utility fuction"""
@@ -25,3 +26,7 @@ def test_looksLikeEmailAddress():
     assert utils.looksLikeEmailAddress("@Exmaple.com") != True
     assert utils.looksLikeEmailAddress("bill@example") != True
     
+    
+def test date_utils():
+    """Test the date conversion methods"""
+    pass
