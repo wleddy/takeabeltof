@@ -66,6 +66,8 @@ def printException(mes="An Unknown Error Occured",level="error",err=None):
     
 def render_markdown_for(source_script,module,file_name):
     """Try to find the file to render and then do so"""
+    from app import app
+    
     rendered_html = ''
     # use similar search approach as flask templeting, root first, then local
     # try to find the root templates directory
@@ -78,6 +80,8 @@ def render_markdown_for(source_script,module,file_name):
         rendered_html = f.read()
         f.close()
         rendered_html = render_markdown_text(rendered_html)
+    elif app.config['DEBUG']:
+        rendered_html = "There was no file found at {} called from {}".format(file_name,source_script,)
 
     return rendered_html
 
