@@ -1,6 +1,6 @@
 """Some date utilities"""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 
 def local_datetime_now(time_zone=None):
@@ -116,6 +116,10 @@ def getDatetimeFromString(dateString):
             
     if theDate == None:
         return None
+        
+    # if the year is > 2040, assume that '51 means 1951 and subtract 100 years
+    if theDate.year >= 2040:
+        theDate = theDate.replace(year=theDate.year - 100)
         
     # Make datetime aware
     theDate = timezone(get_time_zone_setting()).localize(theDate)
