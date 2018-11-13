@@ -2,7 +2,7 @@ from flask import g, redirect, url_for, \
      render_template, render_template_string
 from app import mail, app
 from flask_mail import Message
-from takeabeltof.utils import printException, cleanRecordID
+from takeabeltof.utils import printException, cleanRecordID, looksLikeEmailAddress
 
 def send_message(to_address_list=None,**kwargs):
     """Send an email with the parameters as:
@@ -39,37 +39,66 @@ def send_message(to_address_list=None,**kwargs):
     reply_to = kwargs.get('reply_to',from_address)
     subject = subject_prefix + ' ' +kwargs.get('subject','A message from {}'.format(from_sender))
     
+    admin_addr = app.config['MAIL_DEFAULT_ADDR']
+    admin_name = app.config['MAIL_DEFAULT_SENDER']
+    
+    
     if not text_template and not html_template and not body:
         mes = "No message body was specified"
         printException(mes,"error")
         return (False, mes)
         
-    if not to_address_list or len(to_address_list) == 0 or len(to_address_list[0]) != 2:
+    if not to_address_list or len(to_address_list) == 0:
         #no valid address, so send it to the admin
-        to_address_list = [(app.config['MAIL_DEFAULT_SENDER'],app.config['MAIL_DEFAULT_ADDR']),]
+        to_address_list = [(admin_name,admin_addr),]
         
         
     with mail.record_messages() as outbox:
-        for name,address in to_address_list:
+        for recept in to_address_list:
+            #import pdb;pdb.set_trace()
+            name = ""
+            address = ""
+            body_err_head = ""
+            if type(recept) is tuple:
+                name = recept[0]
+                address = recept[1]
+            else:
+                address = recept #assume its a str
+                
+            if not looksLikeEmailAddress(address) and looksLikeEmailAddress(name):
+                # swap values
+                temp = address
+                address = name
+                name = address
+            if not looksLikeEmailAddress(address):
+                # still not a good address...
+                address = admin_addr
+                name = admin_name
+                if not body:
+                    body = ""
+                    
+                body_err_head = "Bad Addres: {}\r\r".format(recept,)
+                
             subject = render_template_string(subject.strip(),context=context)
             #Start a message
             msg = Message( subject,
                           sender=(from_sender, from_address),
                           recipients=[(name, address)])
-        
+    
             #Get the text body verson
             if body:
                 if body_is_html:
-                    msg.html = render_template_string(body, context=context)
+                    msg.html = render_template_string("{}{}".format(body_err_head,body,), context=context)
                 else:
-                    msg.body = render_template_string(body, context=context)
+                    msg.body = render_template_string("{}{}".format(body_err_head,body,), context=context)
             if html_template:
                 msg.html = render_template(html_template, context=context)
             if text_template:
                 msg.body = render_template(text_template, context=context) 
-                
+            
             msg.reply_to = reply_to
-               
+           
+
             try:
                 mail.send(msg)
             except Exception as e:
@@ -77,11 +106,9 @@ def send_message(to_address_list=None,**kwargs):
                 printException(mes,"error",e)
                 return (False, mes)
 
-            if mail.suppress:
-                mes = '{} email(s) would have been sent if we were not testing'.format(len(outbox),)
-                return (True, mes )
-    
-            return (True, "Email Sent Successfully")
+            # End Loop
+        return (True, "Email Sent Successfully")
+            
             
             
 def email_admin(subject=None,message=None):
@@ -99,10 +126,16 @@ def email_admin(subject=None,message=None):
     if message == None:
         message = "An alert was sent from {} with no message...".format(app.config['SITE_NAME'])
         
-    send_message(
-        None,
-        subject=subject,
-        body = message,
-        )
+    return send_message(
+            None,
+            subject=subject,
+            body = message,
+            )
+        
+        
+def alert_admin(subject=None,message=None):
+    # just an alias to email admin
+    # usually just ignore the return
+    return email_admin(subject,message)
     
     
