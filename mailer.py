@@ -61,7 +61,8 @@ def send_message(to_address_list=None,**kwargs):
             body_err_head = ""
             if type(recept) is tuple:
                 name = recept[0]
-                address = recept[1]
+                if len(recept) > 1:
+                    address = recept[1]
             else:
                 address = recept #assume its a str
                 
