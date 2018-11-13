@@ -10,10 +10,15 @@ import takeabeltof.mailer as mail
 
 def test_send_message():
     with app.app_context():
-        success, mes = mail.send_message([('bill@williesworkshop.com',"Bill Leddy")],body="This is a test",subject="Simple Test")
+        success, mes = mail.send_message([("Bill Leddy",'bill@williesworkshop.com')],body="This is a test",subject="Simple Test")
         assert success == True
         assert mes == "Email Sent Successfully"
     
+        # try sending with the name and addres in the wrong order
+        success, mes = mail.send_message([('bill@williesworkshop.com',"Bill Leddy")],body="This is a test with name and address params reversed",subject="Reversed address Test")
+        assert success == True
+        assert mes == "Email Sent Successfully"
+
         # try address only
         success, mes = mail.send_message(["bill@leddyconsulting.com"],body="Address only test test",subject="Address Test")
         assert success == True
