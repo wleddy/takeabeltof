@@ -70,7 +70,7 @@ def send_message(to_address_list=None,**kwargs):
                 # swap values
                 temp = address
                 address = name
-                name = address
+                name = temp
             if not looksLikeEmailAddress(address):
                 # still not a good address...
                 address = admin_addr
