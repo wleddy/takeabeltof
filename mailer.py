@@ -54,6 +54,10 @@ def send_message(to_address_list=None,**kwargs):
         
         
     with mail.record_messages() as outbox:
+        sent_cnt = 0
+        err_cnt = 0
+        err_list = []
+        result = True
         for recept in to_address_list:
             #import pdb;pdb.set_trace()
             name = ""
@@ -102,13 +106,23 @@ def send_message(to_address_list=None,**kwargs):
 
             try:
                 mail.send(msg)
+                sent_cnt += 1
             except Exception as e:
                 mes = "Error Sending email"
                 printException(mes,"error",e)
-                return (False, mes)
+                err_cnt += 1
+                err_list.append(recpt)
 
-            # End Loop
-        return (True, "Email Sent Successfully")
+        # End Loop
+        if sent_cnt == 0:
+            mes = "No messages were sent."
+            result = False
+        else:
+            mes = "{} messages sent successfully.".format(sent_cnt)
+        if err_cnt > 0:
+            mes = mes + " {} messages had errors.\r\r{}".format(err_cnt,err_list)
+            
+        return (result, mes)
             
             
             
