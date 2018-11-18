@@ -58,17 +58,17 @@ def send_message(to_address_list=None,**kwargs):
         err_cnt = 0
         err_list = []
         result = True
-        for recept in to_address_list:
+        for who in to_address_list:
             #import pdb;pdb.set_trace()
             name = ""
             address = ""
             body_err_head = ""
-            if type(recept) is tuple:
-                name = recept[0]
-                if len(recept) > 1:
-                    address = recept[1]
+            if type(who) is tuple:
+                name = who[0]
+                if len(who) > 1:
+                    address = who[1]
             else:
-                address = recept #assume its a str
+                address = who #assume its a str
                 
             if not looksLikeEmailAddress(address) and looksLikeEmailAddress(name):
                 # swap values
@@ -82,7 +82,7 @@ def send_message(to_address_list=None,**kwargs):
                 if not body:
                     body = ""
                     
-                body_err_head = "Bad Addres: {}\r\r".format(recept,)
+                body_err_head = "Bad Addres: {}\r\r".format(who,)
                 
             subject = render_template_string(subject.strip(),context=context)
             #Start a message
@@ -111,7 +111,7 @@ def send_message(to_address_list=None,**kwargs):
                 mes = "Error Sending email"
                 printException(mes,"error",e)
                 err_cnt += 1
-                err_list.append(recpt)
+                err_list.append(who,mes,)
 
         # End Loop
         if sent_cnt == 0:
