@@ -45,9 +45,9 @@ def test_render_markdown_for():
     from flask import Blueprint
     mod = Blueprint('testme',__name__, template_folder='/takeabeltof/test/templates') 
     result = utils.render_markdown_for(__name__,mod,'test_script.md')
-    assert "There was no file found" in result
+    assert "no file found" in result
     result = utils.render_markdown_for(__name__,mod,'takeabeltof.md')
-    assert "There was no file found" not in result
+    assert "no file found" not in result
     assert "<h1>Takeabeltof</h1>" in result
     
 def test_render_markup_text():

@@ -68,7 +68,7 @@ def render_markdown_for(source_script,module,file_name):
     """Try to find the file to render and then do so"""
     from app import app
     
-    rendered_html = ''
+    rendered_html = None
     # use similar search approach as flask templeting, root first, then local
     # try to find the root templates directory
     markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/templates/{}'.format(file_name)
@@ -81,7 +81,7 @@ def render_markdown_for(source_script,module,file_name):
         f.close()
         rendered_html = render_markdown_text(rendered_html)
     elif app.config['DEBUG']:
-        rendered_html = "There was no file found at {} called from {}".format(file_name,source_script,)
+        rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
 
     return rendered_html
 
