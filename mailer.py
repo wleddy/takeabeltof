@@ -64,11 +64,14 @@ def send_message(to_address_list=None,**kwargs):
             address = ""
             body_err_head = ""
             if type(who) is tuple:
+                if len(who) == 1:
+                    # extend whp
+                    who = who[0] + (who[0],)
                 name = who[0]
-                if len(who) > 1:
-                    address = who[1]
+                address = who[1]
             else:
                 address = who #assume its a str
+                name = who
                 
             if not looksLikeEmailAddress(address) and looksLikeEmailAddress(name):
                 # swap values
