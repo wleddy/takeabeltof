@@ -2,7 +2,7 @@
     Some utility functions
 """
 
-from flask import g
+from flask import g, render_template_string
 from takeabeltof.date_utils import nowString
 import linecache
 import sys
@@ -79,6 +79,10 @@ def render_markdown_for(source_script,module,file_name):
         f = open(markdown_path)
         rendered_html = f.read()
         f.close()
+        
+        # treat the markdown as a template and render url_for and app.config values
+        rendered_html = render_template_string(rendered_html)
+        
         rendered_html = render_markdown_text(rendered_html)
     elif app.config['DEBUG']:
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
