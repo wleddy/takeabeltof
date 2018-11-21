@@ -79,10 +79,7 @@ def render_markdown_for(source_script,module,file_name):
         f = open(markdown_path)
         rendered_html = f.read()
         f.close()
-        
-        # treat the markdown as a template and render url_for and app.config values
-        rendered_html = render_template_string(rendered_html)
-        
+                
         rendered_html = render_markdown_text(rendered_html)
     elif app.config['DEBUG']:
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
@@ -91,5 +88,7 @@ def render_markdown_for(source_script,module,file_name):
 
 
 def render_markdown_text(text_to_render):
+    # treat the markdown as a template and render url_for and app.config values
+    text_to_render = render_template_string(text_to_render)
     return mistune.markdown(text_to_render)
       
