@@ -10,8 +10,11 @@ def short_date_string(value):
     format='%m/%d/%y'
     return date_to_string(value,format)
     
+def long_date_string(value):
+    format='%B %-d, %Y'
+    return date_to_string(value,format)
+    
 def two_decimal_string(the_string):
-    #import pdb;pdb.set_trace()
     try:
         the_string = float(the_string)
         the_string = (str(the_string) + "00")
@@ -27,6 +30,7 @@ def two_decimal_string(the_string):
 def register_jinja_filters(app):
     # register the filters
     app.jinja_env.filters['short_date_string'] = short_date_string
+    app.jinja_env.filters['long_date_string'] = long_date_string
     app.jinja_env.filters['two_decimal_string'] = two_decimal_string
     app.jinja_env.filters['money'] = two_decimal_string
     app.jinja_env.filters['iso_date_string'] = iso_date_string
