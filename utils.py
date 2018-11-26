@@ -97,10 +97,10 @@ def handle_request_error(error=None,request=None,level='info'):
     """Usually used to handle a basic request error such as a db error"""
     from takeabeltof.mailer import alert_admin
     from app import app
-    import pdb;pdb.set_trace()
+
     error_mes = 'The following error was reported from {}\n\n'.format(app.config['SITE_NAME'])
     if not error:
-        error_mes += "Error not provided"
+        error_mes += "Error message not provided"
     else:
         error_mes += str(error)
         
