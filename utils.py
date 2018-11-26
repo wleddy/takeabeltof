@@ -91,4 +91,26 @@ def render_markdown_text(text_to_render):
     # treat the markdown as a template and render url_for and app.config values
     text_to_render = render_template_string(text_to_render)
     return mistune.markdown(text_to_render)
+    
+    
+def handle_request_error(error=None,request=None,level='info'):
+    """Usually used to handle a basic request error such as a db error"""
+    from takeabeltof.mailer import alert_admin
+    from app import app
+    import pdb;pdb.set_trace()
+    error_mes = 'The following error was reported from {}\n\n'.format(app.config['SITE_NAME'])
+    if not error:
+        error_mes += "Error not provided"
+    else:
+        error_mes += str(error)
+        
+    if request:
+        error_mes += '\n\nRequest Data: {}'.format(request.url)
+        
+    printException(error_mes)
+    
+    if (str(error)[:3] == "404" and app.config['REPORT_404_ERRORS']) or level == 'error':
+        alert_admin("Request error at {}".format(app.config['HOST_NAME']),error_mes)
+        
+        
       
