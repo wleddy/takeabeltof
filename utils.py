@@ -112,5 +112,7 @@ def handle_request_error(error=None,request=None,level='info'):
     if (str(error)[:3] == "404" and app.config['REPORT_404_ERRORS']) or level == 'error':
         alert_admin("Request error at {}".format(app.config['HOST_NAME']),error_mes)
         
+    return error_mes # just to make it testable
+        
         
       

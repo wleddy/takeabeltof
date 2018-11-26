@@ -18,6 +18,14 @@ def test_short_date_string():
     assert filters.short_date_string(test_date) == "05/09/18"
     assert filters.short_date_string("2018-05-09") == "05/09/18"
     assert filters.short_date_string("05/09/18") == "05/09/18"
+
+
+def test_long_date_string():
+    test_date = datetime(2018,5,9)
+    assert filters.long_date_string(test_date) == "May 9, 2018"
+    assert filters.long_date_string("2018-05-09") == "May 9, 2018"
+    assert filters.long_date_string("05/09/18") == "May 9, 2018"
+
     
 def test_iso_date_string():
     test_date = datetime(2018,5,9)

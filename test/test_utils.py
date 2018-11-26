@@ -56,3 +56,11 @@ def test_render_markup_text():
     with app.app_context():
         result = utils.render_markdown_text("## Now is the time")
         assert "<h2>Now is the time</h2>" in result
+        
+        
+def test_handle_request_error():
+    #handle_request_error(error=None,request=None,level='info')
+    with app.app_context():
+        from takeabeltof.utils import handle_request_error
+        result = handle_request_error("test for error",None,level='info')
+        assert "test for error" in result
