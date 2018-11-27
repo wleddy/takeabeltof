@@ -1,8 +1,7 @@
-from flask import g, redirect, url_for, \
-     render_template, render_template_string
+from flask import g, flash, render_template_string, render_template
 from app import mail, app
 from flask_mail import Message
-from takeabeltof.utils import printException, cleanRecordID, looksLikeEmailAddress
+from takeabeltof.utils import printException, looksLikeEmailAddress
 
 def send_message(to_address_list=None,**kwargs):
     """Send an email with the parameters as:
@@ -133,23 +132,21 @@ def email_admin(subject=None,message=None):
     """
         Shortcut method to send a quick email to the admin
     """
-    if subject == None and message != None:
-        # assume the subject is really the message
-        message = subject
-        subject = None
+    try:
+        if subject == None:
+            subject = "An alert was sent from {}".format(app.config['SITE_NAME'])
         
-    if subject == None:
-        subject = "An alert was sent from {}".format(app.config['SITE_NAME'])
+        if message == None:
+            message = "An alert was sent from {} with no message...".format(app.config['SITE_NAME'])
         
-    if message == None:
-        message = "An alert was sent from {} with no message...".format(app.config['SITE_NAME'])
-        
-    return send_message(
-            None,
-            subject=subject,
-            body = message,
-            )
-        
+        return send_message(
+                None,
+                subject=subject,
+                body = message,
+                )
+    except Exception as e:
+        flash(printException("Not able to send message to admin.",str(e)))
+    
         
 def alert_admin(subject=None,message=None):
     # just an alias to email admin
