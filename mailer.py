@@ -33,14 +33,20 @@ def send_message(to_address_list=None,**kwargs):
     text_template = kwargs.get('text_template',None)
     html_template = kwargs.get('html_template',None)
     subject_prefix = kwargs.get('subject_prefix','')
-    from_address = kwargs.get('from_address',app.config['MAIL_DEFAULT_ADDR'])
-    from_sender = kwargs.get('from_address',app.config['MAIL_DEFAULT_SENDER'])
+    
+    try:
+        admin_addr = app.config['MAIL_DEFAULT_ADDR']
+        admin_name = app.config['MAIL_DEFAULT_SENDER']
+    except KeyError as e:
+        mes = "MAIL Settings not found"
+        mes = printException(mes,'error',e)
+        return (False, mes)
+    
+    from_address = kwargs.get('from_address',admin_addr)
+    from_sender = kwargs.get('from_sender',admin_name)
     reply_to = kwargs.get('reply_to',from_address)
+    
     subject = subject_prefix + ' ' +kwargs.get('subject','A message from {}'.format(from_sender))
-    
-    admin_addr = app.config['MAIL_DEFAULT_ADDR']
-    admin_name = app.config['MAIL_DEFAULT_SENDER']
-    
     
     if not text_template and not html_template and not body:
         mes = "No message body was specified"
