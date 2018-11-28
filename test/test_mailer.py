@@ -6,6 +6,18 @@ import pytest
 #with pytest.raises(Exception):
 
 from app import app
+app.config['TESTING'] = True
+
+try:
+    from flask_mail import Mail
+    with app.app_context():
+        # need to recreate mail obj to get new TESTING value
+        from app import mail
+        del mail
+        mail = Mail(app)
+except:
+    pass
+
 import takeabeltof.mailer as mail
 
 def test_send_message():
