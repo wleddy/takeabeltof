@@ -2,7 +2,7 @@
     Some utility functions
 """
 
-from flask import g, render_template_string
+from flask import g, render_template_string, flash
 from takeabeltof.date_utils import nowString
 import linecache
 import sys
@@ -93,24 +93,27 @@ def render_markdown_text(text_to_render):
     return mistune.markdown(text_to_render)
     
     
-def handle_request_error(error=None,request=None,level='info'):
+def handle_request_error(error=None,request=None,status=666):
     """Usually used to handle a basic request error such as a db error"""
     from takeabeltof.mailer import alert_admin
     from app import app
-
-    error_mes = 'The following error was reported from {}\n\n'.format(app.config['SITE_NAME'])
+    
+    error_mes = 'The following error was reported from {}. \nRequest status: {}\n\n'.format(app.config['SITE_NAME'],status)
     if not error:
         error_mes += "Error message not provided"
     else:
         error_mes += str(error)
         
     if request:
-        error_mes += '\n\nRequest Data: {}'.format(request.url)
+        error_mes += '\n\nRequest URL: {}'.format(request.url)
         
     printException(error_mes)
     
-    if (str(error)[:3] == "404" and app.config['REPORT_404_ERRORS']) or level == 'error':
-        alert_admin("Request error at {}".format(app.config['HOST_NAME']),error_mes)
+    try:
+        if (status == 404 and app.config['REPORT_404_ERRORS']) or status != 404:
+            alert_admin("Request error [{}] at {}".format(status,app.config['HOST_NAME']),error_mes)
+    except Exception as e:
+        flash(printException("An error was encountered in handle_request_error. {}".format(str(e))))
         
     return error_mes # just to make it testable
         
