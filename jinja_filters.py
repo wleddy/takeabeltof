@@ -16,6 +16,10 @@ def long_date_string(value):
     
 def two_decimal_string(the_string):
     try:
+        if type(the_string) is str:
+            the_string = the_string.strip()
+        if the_string == None or the_string == '':
+            the_string = '0'
         the_string = float(the_string)
         the_string = (str(the_string) + "00")
         pos = the_string.find(".")

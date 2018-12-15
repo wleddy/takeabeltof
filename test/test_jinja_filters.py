@@ -12,6 +12,9 @@ def test_two_digit():
     assert filters.two_decimal_string(1234) == "1234.00"
     assert filters.two_decimal_string("1234") == "1234.00"
     assert filters.two_decimal_string(1234.9999) == "1234.99"
+    assert filters.two_decimal_string("1234.1") == "1234.10"
+    assert filters.two_decimal_string("") == "0.00"
+    assert filters.two_decimal_string(None) == "0.00"
     
 def test_short_date_string():
     test_date = datetime(2018,5,9)
