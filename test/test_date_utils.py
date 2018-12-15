@@ -8,6 +8,7 @@ import takeabeltof.date_utils as dates
 
 def test_local_datetime_now():
     from app import app
+    app.config['TIME_ZONE'] = 'US/Pacific'
     now = datetime.now()
     local_now = dates.local_datetime_now()
     assert now.day == local_now.day
@@ -48,6 +49,9 @@ def test_date_to_string():
 
 def test_nowString():
     # This is really an alias to datetime_as_string
+    from app import app
+    app.config['TIME_ZONE'] = 'US/Pacific'
+
     now = dates.nowString()
     assert now == dates.datetime_as_string(datetime.now())
     
