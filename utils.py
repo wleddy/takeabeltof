@@ -2,7 +2,7 @@
     Some utility functions
 """
 
-from flask import g, render_template_string, flash
+from flask import g, render_template_string, flash, send_from_directory, safe_join
 from takeabeltof.date_utils import nowString
 import linecache
 import sys
@@ -118,4 +118,24 @@ def handle_request_error(error=None,request=None,status=666):
     return error_mes # just to make it testable
         
         
-      
+def send_static_file(filename):
+    """Send the file if it exists, else try to send it from the static directory
+    It's important that the path passed to send_from_directory does not start with a slash."""
+        
+    from app import app
+
+    path = 'instance/static/' # the default location
+    
+    if 'LOCAL_STATIC_FOLDER' in app.config:
+        path = app.config['LOCAL_STATIC_FOLDER']
+        
+    if path[0] == "/":
+        path = path[1:]
+        
+    file_loc = safe_join(os.path.dirname(os.path.abspath(__name__)),path,filename)
+    if not os.path.isfile(file_loc):
+        path = 'static/'
+    
+    return send_from_directory(path,filename, as_attachment=False)
+    
+    
