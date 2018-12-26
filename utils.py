@@ -118,16 +118,14 @@ def handle_request_error(error=None,request=None,status=666):
     return error_mes # just to make it testable
         
         
-def send_static_file(filename):
+def send_static_file(filename,**kwargs):
     """Send the file if it exists, else try to send it from the static directory
     It's important that the path passed to send_from_directory does not start with a slash."""
-        
-    from app import app
-
-    path = 'instance/static/' # the default location
     
-    if 'LOCAL_STATIC_FOLDER' in app.config:
-        path = app.config['LOCAL_STATIC_FOLDER']
+    path = kwargs.get("local_path",None)
+        
+    if not path:
+        path = 'instance/static' #the default path
         
     if path[0] == "/":
         path = path[1:]
