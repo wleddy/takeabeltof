@@ -1,6 +1,6 @@
 from flask import g, flash, render_template_string, render_template
-from app import app, get_app_config
-from flask_mail import Mail, Message
+from app import app, get_app_config, mail
+from flask_mail import Message
 from takeabeltof.utils import printException, looksLikeEmailAddress
 
 def send_message(to_address_list=None,**kwargs):
@@ -27,7 +27,10 @@ def send_message(to_address_list=None,**kwargs):
             success [True or False]
             message "some message"
     """
-    app_config = get_app_config() #update the settings
+    #import pdb;pdb.set_trace()
+    
+    app_config = get_app_config() #update the settings. this also recreates the mail var in app with new settings
+    
     context = kwargs.get('context',{})
     body = kwargs.get('body',None)
     body_is_html = kwargs.get('body_is_html',None)
@@ -58,8 +61,6 @@ def send_message(to_address_list=None,**kwargs):
         #no valid address, so send it to the admin
         to_address_list = [(admin_name,admin_addr),]
         
-    mail = Mail(app)
-    
     with mail.record_messages() as outbox:
         sent_cnt = 0
         err_cnt = 0
@@ -121,7 +122,7 @@ def send_message(to_address_list=None,**kwargs):
                 mes = "Error Sending email"
                 printException(mes,"error",e)
                 err_cnt += 1
-                err_list.append(who,mes,)
+                err_list.append("Error sending message to {} err: {}".format(who,str(e)))
 
         # End Loop
         if sent_cnt == 0:

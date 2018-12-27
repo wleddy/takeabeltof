@@ -34,7 +34,9 @@ def looksLikeEmailAddress(email=""):
     return re.match(r"[^@]+@[^@]+\.[^@]+", email.strip())
     
 def printException(mes="An Unknown Error Occured",level="error",err=None):
-    from app import app
+    from app import get_app_config, app
+    app_config = get_app_config()
+    
     exc_type, exc_obj, tb = sys.exc_info()
     debugMes = None
     if tb is not None:
@@ -48,7 +50,7 @@ def printException(mes="An Unknown Error Occured",level="error",err=None):
         except ValueError:
             debugMes = "Could not get error location info."
             
-    if level=="error" or app.config["DEBUG"]:
+    if level=="error" or app_config["DEBUG"]:
         #always log errors
         if debugMes:
             app.logger.error(nowString() + " - " + debugMes)
@@ -56,7 +58,7 @@ def printException(mes="An Unknown Error Occured",level="error",err=None):
         if err:
             app.logger.error(nowString() + "    " + str(err))
         
-    if app.config["DEBUG"]:
+    if app_config["DEBUG"]:
         if debugMes:
             mes = mes + " -- " +debugMes
         return mes
@@ -66,7 +68,7 @@ def printException(mes="An Unknown Error Occured",level="error",err=None):
     
 def render_markdown_for(source_script,module,file_name):
     """Try to find the file to render and then do so"""
-    from app import app
+    from app import get_app_config
     
     rendered_html = None
     # use similar search approach as flask templeting, root first, then local
@@ -81,7 +83,7 @@ def render_markdown_for(source_script,module,file_name):
         f.close()
                 
         rendered_html = render_markdown_text(rendered_html)
-    elif app.config['DEBUG']:
+    elif get_app_config()['DEBUG']:
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
 
     return rendered_html
@@ -96,9 +98,10 @@ def render_markdown_text(text_to_render):
 def handle_request_error(error=None,request=None,status=666):
     """Usually used to handle a basic request error such as a db error"""
     from takeabeltof.mailer import alert_admin
-    from app import app
+    from app import get_app_config
+    app_config = get_app_config()
     
-    error_mes = 'The following error was reported from {}. \nRequest status: {}\n\n'.format(app.config['SITE_NAME'],status)
+    error_mes = 'The following error was reported from {}. \nRequest status: {}\n\n'.format(app_config['SITE_NAME'],status)
     if not error:
         error_mes += "Error message not provided"
     else:
@@ -110,8 +113,8 @@ def handle_request_error(error=None,request=None,status=666):
     printException(error_mes)
     
     try:
-        if (status == 404 and app.config['REPORT_404_ERRORS']) or status != 404:
-            alert_admin("Request error [{}] at {}".format(status,app.config['HOST_NAME']),error_mes)
+        if (status == 404 and app_config['REPORT_404_ERRORS']) or status != 404:
+            alert_admin("Request error [{}] at {}".format(status,app_config['HOST_NAME']),error_mes)
     except Exception as e:
         flash(printException("An error was encountered in handle_request_error. {}".format(str(e))))
         
