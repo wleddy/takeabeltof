@@ -1,6 +1,6 @@
 from flask import g, flash, render_template_string, render_template
-from app import mail, app
-from flask_mail import Message
+from app import app, get_app_config
+from flask_mail import Mail, Message
 from takeabeltof.utils import printException, looksLikeEmailAddress
 
 def send_message(to_address_list=None,**kwargs):
@@ -27,6 +27,7 @@ def send_message(to_address_list=None,**kwargs):
             success [True or False]
             message "some message"
     """
+    app_config = get_app_config() #update the settings
     context = kwargs.get('context',{})
     body = kwargs.get('body',None)
     body_is_html = kwargs.get('body_is_html',None)
@@ -35,8 +36,8 @@ def send_message(to_address_list=None,**kwargs):
     subject_prefix = kwargs.get('subject_prefix','')
     
     try:
-        admin_addr = app.config['MAIL_DEFAULT_ADDR']
-        admin_name = app.config['MAIL_DEFAULT_SENDER']
+        admin_addr = app_config['MAIL_DEFAULT_ADDR']
+        admin_name = app_config['MAIL_DEFAULT_SENDER']
     except KeyError as e:
         mes = "MAIL Settings not found"
         mes = printException(mes,'error',e)
@@ -57,7 +58,8 @@ def send_message(to_address_list=None,**kwargs):
         #no valid address, so send it to the admin
         to_address_list = [(admin_name,admin_addr),]
         
-        
+    mail = Mail(app)
+    
     with mail.record_messages() as outbox:
         sent_cnt = 0
         err_cnt = 0
@@ -140,10 +142,10 @@ def email_admin(subject=None,message=None):
     """
     try:
         if subject == None:
-            subject = "An alert was sent from {}".format(app.config['SITE_NAME'])
+            subject = "An alert was sent from {}".format(app_config['SITE_NAME'])
         
         if message == None:
-            message = "An alert was sent from {} with no message...".format(app.config['SITE_NAME'])
+            message = "An alert was sent from {} with no message...".format(app_config['SITE_NAME'])
         
         return send_message(
                 None,
