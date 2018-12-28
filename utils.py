@@ -33,7 +33,7 @@ def looksLikeEmailAddress(email=""):
         
     return re.match(r"[^@]+@[^@]+\.[^@]+", email.strip())
     
-def printException(mes="An Unknown Error Occured",level="error",err=None):
+def printException(mes="An Unknown Error Occurred",level="error",err=None):
     from app import get_app_config, app
     app_config = get_app_config()
     
@@ -64,33 +64,41 @@ def printException(mes="An Unknown Error Occured",level="error",err=None):
         return mes
     else:
         return mes
-    
-    
-def render_markdown_for(source_script,module,file_name):
+        
+        
+def render_markdown_for(file_name,source_script=None,module=None):
     """Try to find the file to render and then do so"""
     from app import get_app_config
+    #import pdb;pdb.set_trace()
     
     app_config = get_app_config()
     
     rendered_html = None
     markdown_path = ''
     
+    if type(file_name) == str:
+        file_name= file_name.lstrip('/') #remove leading slash
+    else:
+        file_name = ''
+            
+    root_path = os.path.dirname(os.path.abspath(__name__))
+    
     if app_config['LOCAL_STATIC_FOLDER']:
         # look in the site's private stash...
-        markdown_path = os.path.dirname(os.path.abspath(__name__)) + "/{}/{}".format(app_config['LOCAL_STATIC_FOLDER'],file_name)
+        markdown_path = os.path.join(root_path,app_config['LOCAL_STATIC_FOLDER'],file_name)
     if not os.path.isfile(markdown_path):
         #next try to find the file in the root directory
-        markdown_path = os.path.dirname(os.path.abspath(__name__)) + "/" + file_name
+        markdown_path = os.path.join(root_path, file_name)
     if not os.path.isfile(markdown_path):
         # next, try docs
-        markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/docs/{}'.format(file_name)
+        markdown_path = os.path.join(root_path, '/docs/',file_name)
     if not os.path.isfile(markdown_path):
         # use similar search approach as flask templeting, root first, then local
         # try to find the root templates directory
-        markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/templates/{}'.format(file_name)
-    if not os.path.isfile(markdown_path):
+        markdown_path = os.path.join(root_path, '/templates/',file_name)
+    if not os.path.isfile(markdown_path) and module and source_script:
         # look in the templates directory of the calling blueprint
-        markdown_path = os.path.dirname(os.path.abspath(source_script)) + '/{}/{}'.format(module.template_folder,file_name)
+        markdown_path = os.path.join(os.path.dirname(os.path.abspath(source_script)), module.template_folder,file_name)
     if os.path.isfile(markdown_path):
         f = open(markdown_path)
         rendered_html = f.read()
