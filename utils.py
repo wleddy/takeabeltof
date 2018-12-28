@@ -70,10 +70,24 @@ def render_markdown_for(source_script,module,file_name):
     """Try to find the file to render and then do so"""
     from app import get_app_config
     
+    app_config = get_app_config()
+    
     rendered_html = None
-    # use similar search approach as flask templeting, root first, then local
-    # try to find the root templates directory
-    markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/templates/{}'.format(file_name)
+    markdown_path = ''
+    
+    if app_config['LOCAL_STATIC_FOLDER']:
+        # look in the site's private stash...
+        markdown_path = os.path.dirname(os.path.abspath(__name__)) + "/{}/{}".format(app_config['LOCAL_STATIC_FOLDER'],file_name)
+    if not os.path.isfile(markdown_path):
+        #next try to find the file in the root directory
+        markdown_path = os.path.dirname(os.path.abspath(__name__)) + "/" + file_name
+    if not os.path.isfile(markdown_path):
+        # next, try docs
+        markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/docs/{}'.format(file_name)
+    if not os.path.isfile(markdown_path):
+        # use similar search approach as flask templeting, root first, then local
+        # try to find the root templates directory
+        markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/templates/{}'.format(file_name)
     if not os.path.isfile(markdown_path):
         # look in the templates directory of the calling blueprint
         markdown_path = os.path.dirname(os.path.abspath(source_script)) + '/{}/{}'.format(module.template_folder,file_name)
@@ -83,7 +97,7 @@ def render_markdown_for(source_script,module,file_name):
         f.close()
                 
         rendered_html = render_markdown_text(rendered_html)
-    elif get_app_config()['DEBUG']:
+    elif app_config['DEBUG']:
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
 
     return rendered_html
@@ -125,17 +139,18 @@ def send_static_file(filename,**kwargs):
     """Send the file if it exists, else try to send it from the static directory
     It's important that the path passed to send_from_directory does not start with a slash."""
     
-    path = kwargs.get("local_path",None)
-        
-    if not path:
-        path = 'instance/static' #the default path
+    default_path = 'static/'
+    
+    path = kwargs.get("local_path",default_path)
+    if type(path) != str:
+        path = default_path
         
     if path[0] == "/":
         path = path[1:]
         
     file_loc = safe_join(os.path.dirname(os.path.abspath(__name__)),path,filename)
     if not os.path.isfile(file_loc):
-        path = 'static/'
+        path = default_path
     
     return send_from_directory(path,filename, as_attachment=False)
     
