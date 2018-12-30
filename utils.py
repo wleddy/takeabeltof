@@ -75,7 +75,7 @@ def render_markdown_for(file_name,source_script=None,module=None):
     
     rendered_html = None
     markdown_path = ''
-    
+        
     if type(file_name) == str:
         file_name= file_name.lstrip('/') #remove leading slash
     else:
@@ -91,11 +91,11 @@ def render_markdown_for(file_name,source_script=None,module=None):
         markdown_path = os.path.join(root_path, file_name)
     if not os.path.isfile(markdown_path):
         # next, try docs
-        markdown_path = os.path.join(root_path, '/docs/',file_name)
+        markdown_path = os.path.join(root_path, 'docs',file_name)
     if not os.path.isfile(markdown_path):
         # use similar search approach as flask templeting, root first, then local
         # try to find the root templates directory
-        markdown_path = os.path.join(root_path, '/templates/',file_name)
+        markdown_path = os.path.join(root_path, 'templates',file_name)
     if not os.path.isfile(markdown_path) and module and source_script:
         # look in the templates directory of the calling blueprint
         markdown_path = os.path.join(os.path.dirname(os.path.abspath(source_script)), module.template_folder,file_name)
@@ -111,9 +111,9 @@ def render_markdown_for(file_name,source_script=None,module=None):
     return rendered_html
 
 
-def render_markdown_text(text_to_render):
+def render_markdown_text(text_to_render,**kwargs):
     # treat the markdown as a template and render url_for and app.config values
-    text_to_render = render_template_string(text_to_render)
+    text_to_render = render_template_string(text_to_render,**kwargs)
     return mistune.markdown(text_to_render)
     
     
