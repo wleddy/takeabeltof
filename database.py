@@ -29,7 +29,7 @@ class Database:
             
 
 class SqliteTable:
-    """Handle some basic interactions with the user table"""
+    """Handle some basic interactions with a table"""
     def __init__(self,db_connection):
         self.table_name = None
         self.db = db_connection
@@ -47,7 +47,7 @@ class SqliteTable:
             definition = ',' + definition.strip(',')
             
         sql = """CREATE TABLE IF NOT EXISTS '{}' (
-            'id' INTEGER NOT NULL PRIMARY KEY{}
+            id INTEGER NOT NULL PRIMARY KEY{}
             )""".format(self.table_name,definition,)
         self.db.execute(sql)
         
@@ -72,7 +72,7 @@ class SqliteTable:
         return out
         
     @property
-    def data_tuple(self):
+    def _data_tuple(self):
         """return a namedtuple for use with this table"""        
         return namedlist('DataRow',"{}".format(",".join(self.get_column_names())),default=None,use_slots=self.use_slots)
         
@@ -92,12 +92,12 @@ class SqliteTable:
         """return a list of namedlists based on the list of Row objects provided"""
         out = None
         if row_list and len(row_list)>0 and row_list[0] != None:
-            out = [self.data_tuple(*rec) for rec in row_list]
+            out = [self._data_tuple(*rec) for rec in row_list]
         return out
         
     def new(self,set_defaults=True):
         """return an 'empty' namedlist for the table. Normally set the default values for the table"""
-        rec = self.data_tuple()
+        rec = self._data_tuple()
         if set_defaults:
             self.set_defaults(rec)
         return rec
@@ -220,7 +220,7 @@ class SqliteTable:
         return self._single_row(self.select_raw(sql,params))
             
     def get(self,id,**kwargs):
-        """Return a list of a single namedlist for the ID or None"""
+        """Return a single namedlist for the ID or None"""
         return self._single_row(self.select(where='id = {}'.format(cleanRecordID(id),)))
         
     def _single_row(self,rows):
