@@ -14,21 +14,21 @@ def long_date_string(value):
     format='%B %-d, %Y'
     return date_to_string(value,format)
     
-def two_decimal_string(the_string):
+def two_decimal_string(value):
     try:
-        if type(the_string) is str:
-            the_string = the_string.strip()
-        if the_string == None or the_string == '':
-            the_string = '0'
-        the_string = float(the_string)
-        the_string = (str(the_string) + "00")
-        pos = the_string.find(".")
+        if type(value) is str:
+            value = value.strip()
+        if value == None or value == '':
+            value = '0'
+        value = float(value)
+        value = (str(value) + "00")
+        pos = value.find(".")
         if pos > 0:
-            the_string = the_string[:pos+3]
+            value = value[:pos+3]
     except ValueError as e:
         pass
         
-    return the_string
+    return value
     
 
 def register_jinja_filters(app):
