@@ -43,12 +43,11 @@ def test_printException():
             
 def test_render_markdown_for():
     with app.app_context():
-        # render_markdown_for(source_script,module,file_name):   
         from flask import Blueprint
         mod = Blueprint('testme',__name__) 
-        result = utils.render_markdown_for('test_script.md',__file__,mod)
+        result = utils.render_markdown_for('test_script.md',mod)
         assert "no file found" in result
-        result = utils.render_markdown_for('takeabeltof.md',__file__,mod)
+        result = utils.render_markdown_for('takeabeltof.md',mod)
         assert "no file found" not in result
         assert "<h1>Takeabeltof</h1>" in result
     

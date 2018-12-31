@@ -31,13 +31,15 @@ Log an error and return `mes` with optional debug information. Usually I call th
 > _TODO:_ as of Dec. 2108, it does not actually log anything. Need to fix that.
 
 ---
-> #### render_markdown_for(*file_name,source_script=None,module=None*): => str or None
+> #### render_markdown_for(*file_name,bp=None*): => str or None
 
 Attempts to find the file_name specified (may be a path) and render it from markdown to html.
 
+module is an optional blueprint object.
+
 Usually called as:
 
-`rendered_html = render_markdown_for(filename,__file__,mod)`
+`rendered_html = render_markdown_for(filename,mod)`
 
 The lookup sequence is:
 1. Try the path in setting `LOCAL_STATIC_FOLDER` if defined.

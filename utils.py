@@ -66,7 +66,7 @@ def printException(mes="An Unknown Error Occurred",level="error",err=None):
         return mes
         
         
-def render_markdown_for(file_name,source_script=None,module=None):
+def render_markdown_for(file_name,bp=None):
     """Try to find the file to render and then do so"""
     from app import get_app_config
     #import pdb;pdb.set_trace()
@@ -81,28 +81,28 @@ def render_markdown_for(file_name,source_script=None,module=None):
     else:
         file_name = ''
             
-    root_path = os.path.dirname(os.path.abspath(__name__))
+    application_path = os.path.dirname(os.path.abspath(__name__))
     
     if 'LOCAL_STATIC_FOLDER' in app_config and app_config['LOCAL_STATIC_FOLDER']:
         # look in the site's private stash...
-        markdown_path = os.path.join(root_path,app_config['LOCAL_STATIC_FOLDER'],file_name)
+        markdown_path = os.path.join(application_path,app_config['LOCAL_STATIC_FOLDER'],file_name)
     if not os.path.isfile(markdown_path):
         #next try to find the file in the root directory
-        markdown_path = os.path.join(root_path, file_name)
+        markdown_path = os.path.join(application_path, file_name)
     if not os.path.isfile(markdown_path):
         # next, try docs
-        markdown_path = os.path.join(root_path, 'docs',file_name)
+        markdown_path = os.path.join(application_path, 'docs',file_name)
     if not os.path.isfile(markdown_path):
         # use similar search approach as flask templeting, root first, then local
         # try to find the root templates directory
-        markdown_path = os.path.join(root_path, 'templates',file_name)
-    if not os.path.isfile(markdown_path) and module and source_script:
+        markdown_path = os.path.join(application_path, 'templates',file_name)
+    if not os.path.isfile(markdown_path) and bp:
         # look in the templates directory of the calling blueprint
-        module_template_folder = 'templates' #default
-        if module.template_folder:
-            module_template_folder = module.template_folder.lstrip('/')
+        bp_template_folder = 'templates' #default
+        if bp.template_folder:
+            bp_template_folder = bp.template_folder.lstrip('/')
                 
-        markdown_path = os.path.join(os.path.dirname(os.path.abspath(source_script)), module_template_folder,file_name)
+        markdown_path = os.path.join(bp.root_path, bp_template_folder,file_name)
     if os.path.isfile(markdown_path):
         f = open(markdown_path)
         rendered_html = f.read()
@@ -111,7 +111,10 @@ def render_markdown_for(file_name,source_script=None,module=None):
         rendered_html = render_markdown_text(rendered_html)
     elif app_config['DEBUG']:
         ### TESTING Note: the test is looking for the text 'no file found' in this return.
-        rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
+        source_script = ''
+        if bp:
+            source_script = 'called from {}'.format(bp.root_path)
+        rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {}{}".format(file_name,source_script,)
 
     return rendered_html
 
