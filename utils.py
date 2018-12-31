@@ -83,7 +83,7 @@ def render_markdown_for(file_name,source_script=None,module=None):
             
     root_path = os.path.dirname(os.path.abspath(__name__))
     
-    if app_config['LOCAL_STATIC_FOLDER']:
+    if 'LOCAL_STATIC_FOLDER' in app_config and app_config['LOCAL_STATIC_FOLDER']:
         # look in the site's private stash...
         markdown_path = os.path.join(root_path,app_config['LOCAL_STATIC_FOLDER'],file_name)
     if not os.path.isfile(markdown_path):
@@ -98,7 +98,11 @@ def render_markdown_for(file_name,source_script=None,module=None):
         markdown_path = os.path.join(root_path, 'templates',file_name)
     if not os.path.isfile(markdown_path) and module and source_script:
         # look in the templates directory of the calling blueprint
-        markdown_path = os.path.join(os.path.dirname(os.path.abspath(source_script)), module.template_folder,file_name)
+        module_template_folder = 'templates' #default
+        if module.template_folder:
+            module_template_folder = module.template_folder.lstrip('/')
+                
+        markdown_path = os.path.join(os.path.dirname(os.path.abspath(source_script)), module_template_folder,file_name)
     if os.path.isfile(markdown_path):
         f = open(markdown_path)
         rendered_html = f.read()
@@ -106,6 +110,7 @@ def render_markdown_for(file_name,source_script=None,module=None):
                 
         rendered_html = render_markdown_text(rendered_html)
     elif app_config['DEBUG']:
+        ### TESTING Note: the test is looking for the text 'no file found' in this return.
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {} called from {}".format(file_name,source_script,)
 
     return rendered_html

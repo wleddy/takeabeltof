@@ -142,6 +142,7 @@ def email_admin(subject=None,message=None):
         Shortcut method to send a quick email to the admin
     """
     try:
+        app_config = get_app_config()
         if subject == None:
             subject = "An alert was sent from {}".format(app_config['SITE_NAME'])
         

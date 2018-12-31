@@ -42,7 +42,7 @@ def get_time_zone_setting():
     try:
         from app import get_app_config
         
-        time_zone = app_config()['TIME_ZONE']
+        time_zone = get_app_config()['TIME_ZONE']
     except:
         time_zone = None
         
