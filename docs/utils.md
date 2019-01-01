@@ -3,19 +3,6 @@
 This module is a catch all for a number of functions.
 
 ___
-> #### send_static_file(*filename,**kwargs*): => Flask.Response
-
-This function attempts to locate a file in one or more directories. By including `local_path` in the kwargs it will try
-that path first. If not found there, it will look in the root static directory
-
-The option to override static content (images, js, css ) makes it possible to use an existing repository as the basis for a site but
-still customize it with out altering the repo's files. That way you can still pull from the repo without conflicts.
-
-To use this option, check the config setting for `LOCAL_STATIC_FOLDER` and set the path to somewhere outside of 
-the repo (usually /instance...). Then copy the files from the repo's static folder to there and you can modify
-them as you wish.
-
-___
 > #### cleanRecordID(*id*): => int
 
 Use this to ensure that a value evaluates to an integer. If not, it returns -1.
@@ -37,16 +24,12 @@ Attempts to find the file_name specified (may be a path) and render it from mark
 
 module is an optional blueprint object.
 
-Usually called as:
-
-`rendered_html = render_markdown_for(filename,mod)`
-
 The lookup sequence is:
 1. Try the path in setting `LOCAL_STATIC_FOLDER` if defined.
-2. Try to find the file in the root directory.
+2. Try to find the file in the application root directory.
 3. Try the /docs/ directory.
 4. Try to find the root templates directory. *(Just like Flask does)*
-5. Try in the templates directory of the calling blueprint (If both module & source_script are not None).
+5. Try in the templates directory of the calling blueprint (If both bp is not None).
     
 If the file is not found, return None.
 
@@ -55,6 +38,19 @@ If the file is not found, return None.
 
 This will render the text supplied from markdown to html. Before it tries to render it, the text is passed through 
 Flask.render_template_string with **kwargs as context.
+
+___
+> #### send_static_file(*filename,**kwargs*): => Flask.Response
+
+This function attempts to locate a file in one or more directories. By including `local_path` in the kwargs it will try
+that path first. If not found there, it will look in the root static directory
+
+The option to override static content (images, js, css ) makes it possible to use an existing repository as the basis for a site but
+still customize it with out altering the repo's files. That way you can still pull from the repo without conflicts.
+
+To use this option, check the config setting for `LOCAL_STATIC_FOLDER` and set the path to somewhere outside of 
+the repo (usually /instance...). Then copy the files from the repo's static folder to there and you can modify
+them as you wish.
 
   
 ---
