@@ -114,7 +114,7 @@ def render_markdown_for(file_name,bp=None):
         source_script = ''
         if bp:
             source_script = ' called from {}'.format(bp.import_name)
-        rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {}{}".format(file_name,source_script,)
+        rendered_html = "Because you're in DEBUG mode, you should know that there was no file found: '{}'{}".format(file_name,source_script,)
 
     return rendered_html
 
