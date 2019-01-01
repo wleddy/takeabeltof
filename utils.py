@@ -113,7 +113,7 @@ def render_markdown_for(file_name,bp=None):
         ### TESTING Note: the test is looking for the text 'no file found' in this return.
         source_script = ''
         if bp:
-            source_script = 'called from {}'.format(bp.root_path)
+            source_script = 'called from {}'.format(bp.import_name)
         rendered_html = "Because you're in DEBUG mode, you should know that there was no file found at {}{}".format(file_name,source_script,)
 
     return rendered_html
