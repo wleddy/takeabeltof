@@ -67,7 +67,14 @@ def printException(mes="An Unknown Error Occurred",level="error",err=None):
         
         
 def render_markdown_for(file_name,bp=None):
-    """Try to find the file to render and then do so"""
+    """Try to find the file to render and then do so
+    if file_name has a leading slash, it will be treated as an apbolute path
+    by os.path.join. If that's not what you were expecting, you need to
+    remove any leading slashes before calling this function.
+    
+    (In particular, the shotglass.home.docs route depends on this fact.)
+    
+    """
     from app import get_app_config
     #import pdb;pdb.set_trace()
     
@@ -76,9 +83,7 @@ def render_markdown_for(file_name,bp=None):
     rendered_html = None
     markdown_path = ''
         
-    if type(file_name) == str:
-        file_name= file_name.lstrip('/') #remove leading slash
-    else:
+    if type(file_name) != str:
         file_name = ''
             
     application_path = os.path.dirname(os.path.abspath(__name__))
